@@ -3,16 +3,16 @@ package org.example.expert.domain.manager.service;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.example.expert.domain.common.dto.AuthUser;
+import org.example.expert.domain.common.dto.AuthUserDTO;
 import org.example.expert.domain.common.exception.InvalidRequestException;
-import org.example.expert.domain.manager.dto.request.ManagerSaveRequest;
-import org.example.expert.domain.manager.dto.response.ManagerResponse;
-import org.example.expert.domain.manager.dto.response.ManagerSaveResponse;
+import org.example.expert.domain.manager.dto.request.ManagerSaveRequestDTO;
+import org.example.expert.domain.manager.dto.response.ManagerResponseDTO;
+import org.example.expert.domain.manager.dto.response.ManagerSaveResponseDTO;
 import org.example.expert.domain.manager.entity.Manager;
 import org.example.expert.domain.manager.repository.ManagerRepository;
 import org.example.expert.domain.todo.entity.Todo;
 import org.example.expert.domain.todo.repository.TodoRepository;
-import org.example.expert.domain.user.dto.response.UserResponse;
+import org.example.expert.domain.user.dto.response.UserResponseDTO;
 import org.example.expert.domain.user.entity.User;
 import org.example.expert.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class ManagerService {
     private final TodoRepository todoRepository;
 
     @Transactional
-    public ManagerSaveResponse saveManager(AuthUser authUser, long todoId, ManagerSaveRequest managerSaveRequest) {
+    public ManagerSaveResponseDTO saveManager(AuthUserDTO authUser, long todoId, ManagerSaveRequestDTO managerSaveRequestDTO) {
         // 일정을 만든 유저
         User user = User.fromAuthUser(authUser);
         Todo todo = todoRepository.findById(todoId)
@@ -39,7 +39,7 @@ public class ManagerService {
             throw new InvalidRequestException("담당자를 등록하려고 하는 유저가 일정을 만든 유저가 유효하지 않습니다.");
         }
 
-        User managerUser = userRepository.findById(managerSaveRequest.getManagerUserId())
+        User managerUser = userRepository.findById(managerSaveRequestDTO.getManagerUserId())
                 .orElseThrow(() -> new InvalidRequestException("등록하려고 하는 담당자 유저가 존재하지 않습니다."));
 
         if (ObjectUtils.nullSafeEquals(user.getId(), managerUser.getId())) {
@@ -49,24 +49,24 @@ public class ManagerService {
         Manager newManagerUser = new Manager(managerUser, todo);
         Manager savedManagerUser = managerRepository.save(newManagerUser);
 
-        return new ManagerSaveResponse(
+        return new ManagerSaveResponseDTO(
                 savedManagerUser.getId(),
-                new UserResponse(managerUser.getId(), managerUser.getEmail())
+                new UserResponseDTO(managerUser.getId(), managerUser.getEmail())
         );
     }
 
-    public List<ManagerResponse> getManagers(long todoId) {
+    public List<ManagerResponseDTO> getManagers(long todoId) {
         Todo todo = todoRepository.findById(todoId)
                 .orElseThrow(() -> new InvalidRequestException("Todo not found"));
 
         List<Manager> managerList = managerRepository.findAllByTodoId(todo.getId());
 
-        List<ManagerResponse> dtoList = new ArrayList<>();
+        List<ManagerResponseDTO> dtoList = new ArrayList<>();
         for (Manager manager : managerList) {
             User user = manager.getUser();
-            dtoList.add(new ManagerResponse(
+            dtoList.add(new ManagerResponseDTO(
                     manager.getId(),
-                    new UserResponse(user.getId(), user.getEmail())
+                    new UserResponseDTO(user.getId(), user.getEmail())
             ));
         }
         return dtoList;

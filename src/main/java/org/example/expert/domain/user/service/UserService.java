@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 
 import org.example.expert.config.PasswordEncoder;
 import org.example.expert.domain.common.exception.InvalidRequestException;
-import org.example.expert.domain.user.dto.request.UserChangePasswordRequest;
-import org.example.expert.domain.user.dto.response.UserResponse;
+import org.example.expert.domain.user.dto.request.UserChangePasswordRequestDTO;
+import org.example.expert.domain.user.dto.response.UserResponseDTO;
 import org.example.expert.domain.user.entity.User;
 import org.example.expert.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -19,13 +19,13 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 
-	public UserResponse findUserById(long userId) {
+	public UserResponseDTO findUserById(long userId) {
 		User user = userRepository.findById(userId).orElseThrow(() -> new InvalidRequestException("User not found"));
-		return new UserResponse(user.getId(), user.getEmail());
+		return new UserResponseDTO(user.getId(), user.getEmail());
 	}
 
 	@Transactional
-	public void changePassword(long userId, UserChangePasswordRequest userChangePasswordRequest) {
+	public void changePassword(long userId, UserChangePasswordRequestDTO userChangePasswordRequest) {
 		if (userChangePasswordRequest.getNewPassword().length() < 8 ||
 			!userChangePasswordRequest.getNewPassword().matches(".*\\d.*") ||
 			!userChangePasswordRequest.getNewPassword().matches(".*[A-Z].*")) {

@@ -4,10 +4,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.example.expert.domain.common.annotation.Auth;
-import org.example.expert.domain.common.dto.AuthUser;
-import org.example.expert.domain.todo.dto.request.TodoSaveRequest;
-import org.example.expert.domain.todo.dto.response.TodoResponse;
-import org.example.expert.domain.todo.dto.response.TodoSaveResponse;
+import org.example.expert.domain.common.dto.AuthUserDTO;
+import org.example.expert.domain.todo.dto.request.TodoSaveRequestDTO;
+import org.example.expert.domain.todo.dto.response.TodoResponseDTO;
+import org.example.expert.domain.todo.dto.response.TodoSaveResponseDTO;
 import org.example.expert.domain.todo.service.TodoService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -20,15 +20,15 @@ public class TodoController {
 	private final TodoService todoService;
 
 	@PostMapping("/todos")
-	public ResponseEntity<TodoSaveResponse> saveTodo(
-		@Auth AuthUser authUser,
-		@Valid @RequestBody TodoSaveRequest todoSaveRequest
+	public ResponseEntity<TodoSaveResponseDTO> saveTodo(
+		@Auth AuthUserDTO authUser,
+		@Valid @RequestBody TodoSaveRequestDTO todoSaveRequest
 	) {
 		return ResponseEntity.ok(todoService.saveTodo(authUser, todoSaveRequest));
 	}
 
 	@GetMapping("/todos")
-	public ResponseEntity<Page<TodoResponse>> findAllTodos(
+	public ResponseEntity<Page<TodoResponseDTO>> findAllTodos(
 		@RequestParam(defaultValue = "1") int page,
 		@RequestParam(defaultValue = "10") int size
 	) {
@@ -36,7 +36,7 @@ public class TodoController {
 	}
 
 	@GetMapping("/todos/{todoId}")
-	public ResponseEntity<TodoResponse> findTodoById(@PathVariable long todoId) {
+	public ResponseEntity<TodoResponseDTO> findTodoById(@PathVariable long todoId) {
 		return ResponseEntity.ok(todoService.findTodoById(todoId));
 	}
 }

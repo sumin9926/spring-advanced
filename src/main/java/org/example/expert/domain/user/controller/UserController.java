@@ -3,9 +3,9 @@ package org.example.expert.domain.user.controller;
 import lombok.RequiredArgsConstructor;
 
 import org.example.expert.domain.common.annotation.Auth;
-import org.example.expert.domain.common.dto.AuthUser;
-import org.example.expert.domain.user.dto.request.UserChangePasswordRequest;
-import org.example.expert.domain.user.dto.response.UserResponse;
+import org.example.expert.domain.common.dto.AuthUserDTO;
+import org.example.expert.domain.user.dto.request.UserChangePasswordRequestDTO;
+import org.example.expert.domain.user.dto.response.UserResponseDTO;
 import org.example.expert.domain.user.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,13 +17,13 @@ public class UserController {
 	private final UserService userService;
 
 	@GetMapping("/users/{userId}")
-	public ResponseEntity<UserResponse> findUserById(@PathVariable long userId) {
+	public ResponseEntity<UserResponseDTO> findUserById(@PathVariable long userId) {
 		return ResponseEntity.ok(userService.findUserById(userId));
 	}
 
 	@PutMapping("/users")
-	public void changePassword(@Auth AuthUser authUser,
-		@RequestBody UserChangePasswordRequest userChangePasswordRequest) {
+	public void changePassword(@Auth AuthUserDTO authUser,
+		@RequestBody UserChangePasswordRequestDTO userChangePasswordRequest) {
 		userService.changePassword(authUser.getId(), userChangePasswordRequest);
 	}
 }

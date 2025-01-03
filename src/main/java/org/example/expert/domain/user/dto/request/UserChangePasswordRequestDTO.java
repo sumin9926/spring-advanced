@@ -1,4 +1,4 @@
-package org.example.expert.domain.comment.dto.request;
+package org.example.expert.domain.user.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -8,8 +8,11 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentSaveRequest {
+public class UserChangePasswordRequestDTO {
 
-    @NotBlank
-    private String contents;
+	@NotBlank
+	private String oldPassword;
+
+	@NotBlank
+	private String newPassword;
 }

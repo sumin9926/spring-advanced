@@ -1,15 +1,12 @@
 package org.example.expert.domain.user.dto.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-public class UserResponse {
+@AllArgsConstructor
+public class UserResponseDTO {
 
     private final Long id;
     private final String email;
-
-    public UserResponse(Long id, String email) {
-        this.id = id;
-        this.email = email;
-    }
 }

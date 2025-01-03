@@ -2,7 +2,9 @@ package org.example.expert.domain.comment.service;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
+
 import org.example.expert.domain.comment.dto.request.CommentSaveRequestDTO;
 import org.example.expert.domain.comment.dto.response.CommentResponseDTO;
 import org.example.expert.domain.comment.dto.response.CommentSaveResponseDTO;
@@ -22,43 +24,44 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class CommentService {
 
-    private final TodoRepository todoRepository;
-    private final CommentRepository commentRepository;
+	private final TodoRepository todoRepository;
+	private final CommentRepository commentRepository;
 
-    @Transactional
-    public CommentSaveResponseDTO saveComment(AuthUserDTO authUser, long todoId, CommentSaveRequestDTO commentSaveRequest) {
-        User user = User.fromAuthUser(authUser);
-        Todo todo = todoRepository.findById(todoId).orElseThrow(() ->
-                new InvalidRequestException("Todo not found"));
+	@Transactional
+	public CommentSaveResponseDTO saveComment(AuthUserDTO authUser, long todoId,
+		CommentSaveRequestDTO commentSaveRequest) {
+		User user = User.fromAuthUser(authUser);
+		Todo todo = todoRepository.findById(todoId).orElseThrow(() ->
+			new InvalidRequestException("Todo not found"));
 
-        Comment newComment = new Comment(
-                commentSaveRequest.getContents(),
-                user,
-                todo
-        );
+		Comment newComment = new Comment(
+			commentSaveRequest.getContents(),
+			user,
+			todo
+		);
 
-        Comment savedComment = commentRepository.save(newComment);
+		Comment savedComment = commentRepository.save(newComment);
 
-        return new CommentSaveResponseDTO(
-                savedComment.getId(),
-                savedComment.getContents(),
-                new UserResponseDTO(user.getId(), user.getEmail())
-        );
-    }
+		return new CommentSaveResponseDTO(
+			savedComment.getId(),
+			savedComment.getContents(),
+			new UserResponseDTO(user.getId(), user.getEmail())
+		);
+	}
 
-    public List<CommentResponseDTO> getComments(long todoId) {
-        List<Comment> commentList = commentRepository.findAllByTodoId(todoId);
+	public List<CommentResponseDTO> getComments(long todoId) {
+		List<Comment> commentList = commentRepository.findAllByTodoId(todoId);
 
-        List<CommentResponseDTO> dtoList = new ArrayList<>();
-        for (Comment comment : commentList) {
-            User user = comment.getUser();
-            CommentResponseDTO dto = new CommentResponseDTO(
-                    comment.getId(),
-                    comment.getContents(),
-                    new UserResponseDTO(user.getId(), user.getEmail())
-            );
-            dtoList.add(dto);
-        }
-        return dtoList;
-    }
+		List<CommentResponseDTO> dtoList = new ArrayList<>();
+		for (Comment comment : commentList) {
+			User user = comment.getUser();
+			CommentResponseDTO dto = new CommentResponseDTO(
+				comment.getId(),
+				comment.getContents(),
+				new UserResponseDTO(user.getId(), user.getEmail())
+			);
+			dtoList.add(dto);
+		}
+		return dtoList;
+	}
 }

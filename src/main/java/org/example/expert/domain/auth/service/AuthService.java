@@ -4,12 +4,9 @@ import lombok.RequiredArgsConstructor;
 
 import org.example.expert.config.JwtUtil;
 import org.example.expert.config.PasswordEncoder;
-import org.example.expert.domain.auth.dto.request.SigninRequestDTO;
-import org.example.expert.domain.auth.dto.request.SignupRequestDTO;
-import org.example.expert.domain.auth.dto.response.SigninResponseDTO;
-import org.example.expert.domain.auth.dto.response.SignupResponseDTO;
+import org.example.expert.domain.auth.dto.request.*;
+import org.example.expert.domain.auth.dto.response.*;
 import org.example.expert.domain.auth.exception.AuthException;
-import org.example.expert.domain.common.exception.InvalidRequestException;
 import org.example.expert.domain.user.entity.User;
 import org.example.expert.domain.user.enums.UserRole;
 import org.example.expert.domain.user.repository.UserRepository;
@@ -28,19 +25,12 @@ public class AuthService {
 	@Transactional
 	public SignupResponseDTO signup(SignupRequestDTO signupRequest) {
 
-		if (userRepository.existsByEmail(signupRequest.getEmail())) {
-			throw new InvalidRequestException("이미 존재하는 이메일입니다.");
-		}
+		userRepository.existsByEmailOrElseThrow(signupRequest.getEmail());
 
 		String encodedPassword = passwordEncoder.encode(signupRequest.getPassword());
 
 		UserRole userRole = UserRole.of(signupRequest.getUserRole());
-
-		User newUser = new User(
-			signupRequest.getEmail(),
-			encodedPassword,
-			userRole
-		);
+		User newUser = new User(signupRequest.getEmail(), encodedPassword, userRole);
 		User savedUser = userRepository.save(newUser);
 
 		String bearerToken = jwtUtil.createToken(savedUser.getId(), savedUser.getEmail(), userRole);
@@ -49,16 +39,19 @@ public class AuthService {
 	}
 
 	public SigninResponseDTO signin(SigninRequestDTO signinRequest) {
-		User user = userRepository.findByEmail(signinRequest.getEmail()).orElseThrow(
-			() -> new InvalidRequestException("가입되지 않은 유저입니다."));
+		User user = userRepository.findByEmailOrElseThrow(signinRequest.getEmail());
 
-		// 로그인 시 이메일과 비밀번호가 일치하지 않을 경우 401을 반환합니다.
-		if (!passwordEncoder.matches(signinRequest.getPassword(), user.getPassword())) {
-			throw new AuthException("잘못된 비밀번호입니다.");
-		}
+		validatePassword(signinRequest, user);
 
 		String bearerToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getUserRole());
 
 		return new SigninResponseDTO(bearerToken);
 	}
+
+	private void validatePassword(SigninRequestDTO signinRequest, User user) {
+		if (!passwordEncoder.matches(signinRequest.getPassword(), user.getPassword())) {
+			throw new AuthException("잘못된 비밀번호입니다.");
+		}
+	}
+
 }

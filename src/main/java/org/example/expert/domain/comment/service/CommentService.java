@@ -9,6 +9,7 @@ import org.example.expert.domain.comment.dto.request.CommentSaveRequestDTO;
 import org.example.expert.domain.comment.dto.response.*;
 import org.example.expert.domain.common.dto.AuthUserDTO;
 import org.example.expert.domain.comment.entity.Comment;
+import org.example.expert.domain.common.exception.InvalidRequestException;
 import org.example.expert.domain.todo.entity.Todo;
 import org.example.expert.domain.user.entity.User;
 import org.example.expert.domain.comment.repository.CommentRepository;
@@ -29,7 +30,7 @@ public class CommentService {
 	public CommentSaveResponseDTO saveComment(AuthUserDTO authUser, long todoId,
 		CommentSaveRequestDTO commentSaveRequest) {
 		User user = User.fromAuthUser(authUser);
-		Todo todo = todoRepository.findByIdOrElseThrow(todoId);
+		Todo todo = todoRepository.findById(todoId).orElseThrow(()->new InvalidRequestException("Todo not found"));
 
 		Comment newComment = new Comment(commentSaveRequest.getContents(), user, todo);
 		Comment savedComment = commentRepository.save(newComment);

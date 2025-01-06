@@ -50,7 +50,8 @@ public class ManagerService {
 	}
 
 	public List<ManagerResponseDTO> getManagers(long todoId) {
-		Todo todo = todoRepository.findByIdOrElseThrow(todoId);
+		//테스트 코드 작성을 위해 해당 코드만 예외적으로 예외처리를 getManagers 메서드에서 구현함
+		Todo todo = todoRepository.findById(todoId).orElseThrow(() -> new InvalidRequestException("Todo not found"));
 
 		List<Manager> managerList = managerRepository.findAllByTodoId(todo.getId());
 

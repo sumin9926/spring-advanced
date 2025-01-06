@@ -1,10 +1,16 @@
 package org.example.expert.domain.manager.repository;
 
 import java.util.List;
+
+import org.example.expert.domain.common.exception.InvalidRequestException;
 import org.example.expert.domain.manager.entity.Manager;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ManagerRepository extends JpaRepository<Manager, Long> {
 
     List<Manager> findAllByTodoId(Long todoId);
+
+    default Manager findByIdOrElseThrow(long id){
+        return findById(id).orElseThrow(()->new InvalidRequestException("Manager not found"));
+    }
 }
